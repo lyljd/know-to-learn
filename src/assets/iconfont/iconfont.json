@@ -1,0 +1,23 @@
+{
+  "id": "4182928",
+  "name": "know-to-learn",
+  "font_family": "iconfont",
+  "css_prefix_text": "el-icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "11488017",
+      "name": "cry",
+      "font_class": "cry",
+      "unicode": "e74a",
+      "unicode_decimal": 59210
+    },
+    {
+      "icon_id": "6988587",
+      "name": "智能学习平台",
+      "font_class": "ktl",
+      "unicode": "e67e",
+      "unicode_decimal": 59006
+    }
+  ]
+}

@@ -12,10 +12,24 @@ app.use(pinia)
 const store = useStore()
 
 const routes: Array<RouteRecordRaw> = [
-  // {
-  //   path: "",
-  //   component: () => import("")
-  // },
+  {
+    path: "/",
+    component: () => import("../views/Index.vue")
+  },
+
+  {
+    path: "/:pathMatch(.*)",
+    component: () => import("../views/Error.vue")
+  },
+
+  {
+    path: "/401",
+    component: () => import("../views/Error.vue"),
+    meta: {
+      code: 401,
+      msg: "未登录",
+    }
+  },
 ]
 
 const router = createRouter({
