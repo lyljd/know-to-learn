@@ -2,7 +2,7 @@
   <div v-if="!common.isMobile()">
     <el-backtop :right="50" :bottom="50" />
 
-    <TopMenuBar></TopMenuBar>
+    <TopMenuBar v-if="$route.path !== '/'"></TopMenuBar>
 
     <div v-if="$route.path !== '/'" class="placeholder"></div>
 

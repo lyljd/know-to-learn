@@ -1,4 +1,6 @@
 <template>
+  <TopMenuBar :special="true"></TopMenuBar>
+
   <div class="i-container">
     <div style="display: flex; flex-direction: column;">
       <el-carousel :interval="5000" :pause-on-hover="false" arrow="never" indicator-position="none" style="height: 100vh;">
@@ -37,6 +39,7 @@
 <script setup lang="ts">
 import * as API from '@/api/common'
 import * as common from '@/common'
+import TopMenuBar from '@/components/TopMenuBar.vue'
 
 type HomePage = {
   firstSlogan: string

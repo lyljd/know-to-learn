@@ -2,7 +2,7 @@
   <div class="tmb-container">
     <el-menu class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
       <div class="logo">
-        <img class="icon" src="../../public/ktl.png">
+        <img class="icon" :src="special && isTop ? '../../public/ktl2.png' : '../../public/ktl.png'">
         <span class="site-name">知学随学</span>
       </div>
 
@@ -19,7 +19,7 @@
 
       <div class="search-bar">
         <el-input class="search" @keyup.enter.native="toSearch" v-model="searchKey" placeholder="搜索" clearable>
-          <template #prefix><el-icon @click="toSearch" style="cursor: pointer;">
+          <template #prefix><el-icon @click="toSearch" class="search-icon">
               <search />
             </el-icon></template>
         </el-input>
@@ -61,6 +61,12 @@ import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
 import LoginWindow from "@/components/LoginWindow.vue"
 
+const data = withDefaults(defineProps<{
+  special: boolean,
+}>(), {
+  special: false,
+})
+
 const route = useRoute()
 const store = useStore()
 store.openLoginWindow = openLoginWindow
@@ -71,6 +77,82 @@ const loginWindow = ref<InstanceType<typeof LoginWindow>>()
 let searchKey = ref("")
 let avatarUrl = ref(localStorage.getItem("avatarUrl"))
 let nickname = ref(localStorage.getItem("nickname") ? localStorage.getItem("nickname") : "null")
+let isTop = ref(false)
+
+onMounted(() => {
+  if (data.special) {
+    isTop.value = true
+    const menu = document.querySelector(".tmb-container .menu") as HTMLElement
+    const search = document.querySelector(".tmb-container .search-bar .el-input__wrapper") as HTMLElement
+    const searchInner = document.querySelector(".tmb-container .search-bar .el-input__wrapper .el-input__inner") as HTMLElement
+    const searchIcon = document.querySelector(".tmb-container .search .search-icon") as HTMLElement
+    const items = document.querySelectorAll(".tmb-container .el-menu-item")
+    const subItems = document.querySelectorAll(".tmb-container .el-sub-menu__title")
+    const activeItem = document.querySelector(".tmb-container .el-menu-item.is-active") as HTMLElement
+    const searchInnerPlaceholder = document.createElement("style")
+    searchInnerPlaceholder.textContent = `.tmb-container .search-bar .el-input__wrapper .el-input__inner::placeholder {color: white;}`
+    menu.style.background = "none"
+    menu.style.borderBottom = "none"
+    menu.style.color = "white"
+    search.style.boxShadow = "none"
+    search.style.background = "rgba(255, 255, 255, 0.25)"
+    searchInner.style.color = "white"
+    searchIcon.style.color = "white"
+    items.forEach(ele => {
+      ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
+    })
+    setTimeout(() => {
+      subItems.forEach(ele => {
+        ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
+      })
+    }, 0);
+    activeItem.setAttribute("style", "color: white !important; border-bottom: 2px solid white !important;")
+    document.head.appendChild(searchInnerPlaceholder)
+
+    window.addEventListener("scroll", () => {
+      if (scrollY > 57) {
+        isTop.value = false
+        menu.style.background = "white"
+        menu.style.borderBottom = "1px solid #c8c9cc"
+        menu.style.color = "#303133"
+        search.style.boxShadow = "0 0 0 1px var(--el-input-border-color,var(--el-border-color)) inset"
+        search.style.backgroundColor = "white"
+        searchInner.style.color = "#303133"
+        searchIcon.style.color = "#909399"
+        items.forEach(ele => {
+          ele.setAttribute("style", "color: #303133 !important; border-bottom: none !important;")
+        })
+        setTimeout(() => {
+          subItems.forEach(ele => {
+            ele.setAttribute("style", "color: #303133 !important; border-bottom: none !important;")
+          })
+        }, 0);
+        activeItem.setAttribute("style", "color: #409EFF !important; border-bottom: 2px solid #409EFF !important;")
+        searchInnerPlaceholder.remove()
+        return
+      }
+
+      isTop.value = true
+      menu.style.background = "none"
+      menu.style.borderBottom = "none"
+      menu.style.color = "white"
+      search.style.boxShadow = "none"
+      search.style.background = "rgba(255, 255, 255, 0.25)"
+      searchInner.style.color = "white"
+      searchIcon.style.color = "white"
+      items.forEach(ele => {
+        ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
+      })
+      setTimeout(() => {
+        subItems.forEach(ele => {
+          ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
+        })
+      }, 0);
+      activeItem.setAttribute("style", "color: white !important; border-bottom: 2px solid white !important;")
+      document.head.appendChild(searchInnerPlaceholder)
+    })
+  }
+})
 
 function toSearch() {
   if (searchKey.value.trim() === '') {
@@ -158,6 +240,10 @@ function logout() {
   width: 300px;
 }
 
+.tmb-container .search .search-icon {
+  cursor: pointer;
+}
+
 .tmb-container .login-btn {
   width: 40px;
   height: 40px;
@@ -202,6 +288,11 @@ function logout() {
   color: inherit !important;
 }
 
+.tmb-container .el-menu-item:focus {
+  background-color: unset !important;
+  color: inherit !important;
+}
+
 .tmb-container .el-menu-item,
 .tmb-container .el-sub-menu__title {
   padding-left: 10px !important;
@@ -210,6 +301,8 @@ function logout() {
 
 .tmb-container .el-sub-menu__title {
   margin-right: 15px !important;
+  background: unset !important;
+  color: inherit !important;
 }
 
 .tmb-container .el-sub-menu__icon-arrow {
@@ -219,4 +312,8 @@ function logout() {
 .tmb-container .search-bar .el-input__wrapper {
   border-radius: 10px !important;
 }
+
+/* .tmb-container .search-bar .el-input__wrapper .el-input__inner::placeholder {
+  color: #909399;
+} */
 </style>
