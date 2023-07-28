@@ -1,9 +1,9 @@
 <template>
   <div class="lw-container">
     <el-dialog @close="clearInput" v-model="dialogVisible" :width="480" :close-on-press-escape=false
-      :close-on-click-modal=false :align-center=true>
+      :close-on-click-modal=false :align-center=true destroy-on-close>
       <el-tabs @tab-change="tabChange" v-model="option">
-        <el-tab-pane label="邮箱登录/注册" name="vcode">
+        <el-tab-pane label="邮箱登录/注册" name="email">
           <div class="input-box">
             <div class="row">
               <span class="tag">邮箱</span>
@@ -21,8 +21,8 @@
         <el-tab-pane label="密码登录" name="password">
           <div class="input-box">
             <div class="row">
-              <span class="tag">邮箱</span>
-              <el-input class="input" v-model="email" placeholder="请输入邮箱" />
+              <span class="tag">用户名</span>
+              <el-input class="input" v-model="username" placeholder="请输入用户名（默认为邮箱）" />
             </div>
             <div class="row">
               <span class="tag">密码</span>
@@ -33,7 +33,8 @@
         </el-tab-pane>
       </el-tabs>
       <template #footer>
-        <el-button @click="login" :disabled="!loginBtnCheck()" class="btn" type="primary">{{ btnText }}</el-button>
+        <el-button @click="login" :disabled="!loginBtnCheck()" id="login-btn" class="btn" type="primary">{{
+          btnText }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -42,18 +43,24 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
-import CaptchaWindow from "./CaptchaWindow.vue"
-import { useStore } from "../store"
+import * as common from "@/common"
+import * as API from '@/api/user'
+import CaptchaWindow from "@/components/CaptchaWindow.vue"
+import { useStore } from "@/store"
 import { useRouter } from "vue-router"
 import { ElNotification } from 'element-plus'
 
 type LoginInfo = {
-  uid: number,
   nickname: string,
   avatarUrl: string,
   token: string,
-  refreshToken: string,
+}
+
+type LoginAPIPara = {
+  type: string,
+  username: string,
+  code?: string,
+  password?: string,
 }
 
 defineExpose({
@@ -67,10 +74,11 @@ const captchaWindow = ref<InstanceType<typeof CaptchaWindow>>()
 
 let dialogVisible = ref(false)
 let afterSuccDo: Function
-let option = ref("vcode")
+let option = ref("email")
 let btnText = ref("登录/注册")
 let email = ref("")
 let vcode = ref("")
+let username = ref("")
 let password = ref("")
 let hasVerify = ref(false)
 
@@ -93,12 +101,31 @@ function tabChange(newTabName: string) {
 }
 
 function openCaptchaWindow() {
-  captchaWindow.value?.show((cdTime: number) => {
-    let btn = document.getElementById("get-captcha-btn") as HTMLButtonElement
-    common.btnCD(btn, cdTime)
-    hasVerify.value = true
-    common.showSuccess("验证码已发送")
+  captchaWindow.value?.show((payload: string) => {
+    getVcode(payload)
   })
+}
+
+function getVcode(payload: string) {
+  API.getVcode(email.value, payload)
+    .then((res) => {
+      let btn = document.getElementById("get-captcha-btn") as HTMLButtonElement
+      common.btnCD(btn, res.data.ttl)
+
+      if (res.code !== 200) {
+        common.showError(res.message)
+        if (res.code === 400) {
+          hasVerify.value = true
+        }
+        return
+      }
+
+      hasVerify.value = true
+      common.showSuccess(res.message)
+    })
+    .catch((error) => {
+      common.showError(error.message)
+    })
 }
 
 function clearInput() {
@@ -116,20 +143,24 @@ function checkVcodeValid(): boolean {
   return vcodeRegex.test(vcode.value)
 }
 
+function checkUsernameValid(): boolean {
+  return username.value.length >= 1
+}
+
 function checkPasswordValid(): boolean {
   return password.value.length >= 6 && password.value.length <= 16
 }
 
 function loginBtnCheck(): boolean {
   switch (option.value) {
-    case "vcode": {
+    case "email": {
       if (hasVerify.value && checkVcodeValid()) {
         return true
       }
       break
     }
     case "password": {
-      if (checkEmailValid() && checkPasswordValid()) {
+      if (checkUsernameValid() && checkPasswordValid()) {
         return true
       }
       break
@@ -138,43 +169,78 @@ function loginBtnCheck(): boolean {
   return false
 }
 
-function mockLogin(): LoginInfo {
-  let li: LoginInfo = {
-    "uid": 1,
-    "nickname": "ljd",
-    "avatarUrl": "",
-    "token": "payload.signature-token",
-    "refreshToken": "payload.signature-refreshToken",
-  }
-  return li
-}
-
-function saveLoginInfo(li: LoginInfo) {
-  localStorage.setItem("uid", li.uid.toString())
-  localStorage.setItem("nickname", li.nickname)
-  localStorage.setItem("avatarUrl", li.avatarUrl)
-  localStorage.setItem("token", li.token)
-  localStorage.setItem("refreshToken", li.refreshToken)
-}
-
 function login() {
   if (!loginBtnCheck()) {
     return
   }
 
-  let li = mockLogin()
-  afterSuccDo(li.avatarUrl, li.nickname)
-  saveLoginInfo(li)
-
-  dialogVisible.value = false
-  store.isLogin = true
-
-  let index = location.href.lastIndexOf("from=")
-  if (index !== -1) {
-    router.replace(location.href.slice(index + 5))
+  let loginBtn = document.getElementById("login-btn") as HTMLButtonElement
+  if (loginBtn.disabled) {
+    return
   }
 
-  showLoginSuccess(li.nickname)
+  common.btnCD(loginBtn, 3)
+
+  switch (option.value) {
+    case "email": {
+      loginAPI({
+        type: "email",
+        username: email.value,
+        code: vcode.value,
+      })
+      break
+    }
+    case "password": {
+      loginAPI({
+        type: "password",
+        username: username.value,
+        password: password.value,
+      })
+      break
+    }
+  }
+}
+
+function loginAPI(para: LoginAPIPara) {
+  API.login(para)
+    .then((res) => {
+      if (res.code !== 200) {
+        common.showError(res.message)
+        return
+      }
+
+      let li: LoginInfo = {
+        nickname: res.data.userInfo.nickname,
+        avatarUrl: res.data.userInfo.avatar,
+        token: res.data.token,
+      }
+
+      saveLoginInfo(li)
+      afterSuccDo(li.avatarUrl, li.nickname)
+
+      dialogVisible.value = false
+      store.isLogin = true
+
+      email.value = ""
+      username.value = ""
+      hasVerify.value = false
+
+      let index = location.href.lastIndexOf("from=")
+      if (index !== -1) {
+        router.replace(location.href.slice(index + 5))
+      }
+
+      showLoginSuccess(li.nickname)
+    })
+    .catch((error) => {
+      common.showError(error.message)
+    })
+}
+
+function saveLoginInfo(li: LoginInfo) {
+  localStorage.setItem("nickname", li.nickname)
+  localStorage.setItem("avatarUrl", li.avatarUrl)
+  localStorage.setItem("token", li.token)
 }
 
 function showLoginSuccess(nickname: string) {

@@ -31,18 +31,17 @@ function showInfo(msg: string) {
   })
 }
 
-function btnCD(btn: HTMLButtonElement, cd: number) {
-  let time = cd / 1000
+function btnCD(btn: HTMLButtonElement, cdTime: number) {
   let text = btn.innerText
 
   btn.disabled = true
   btn.classList.add('is-disabled')
-  btn.innerText = text + "(" + time + ")"
+  btn.innerText = text + "(" + cdTime + ")"
 
   let dec = setInterval(() => {
-    time--
-    btn.innerText = text + "(" + time + ")"
-    if (time === 0) {
+    cdTime--
+    btn.innerText = text + "(" + cdTime + ")"
+    if (cdTime === 0) {
       clearInterval(dec);
       btn.innerText = text
       btn.classList.remove('is-disabled')

@@ -3,7 +3,7 @@
     <el-menu class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
       <div class="logo">
         <img class="icon" src="../../public/ktl.png">
-        <span class="notice">知学随学</span>
+        <span class="site-name">知学随学</span>
       </div>
 
       <el-menu-item index="/">首页</el-menu-item>
@@ -56,10 +56,10 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "../common"
+import * as common from "@/common"
 import { useRoute } from 'vue-router'
-import { useStore } from "../store"
-import LoginWindow from "../components/LoginWindow.vue"
+import { useStore } from "@/store"
+import LoginWindow from "@/components/LoginWindow.vue"
 
 const route = useRoute()
 const store = useStore()
@@ -149,12 +149,12 @@ function logout() {
   vertical-align: top;
 }
 
-.tmb-container .logo .notice {
+.tmb-container .logo .site-name {
   font-size: 30px;
   cursor: default;
 }
 
-.tmb-container .search {
+.tmb-container .search-bar .search {
   width: 300px;
 }
 
@@ -193,20 +193,13 @@ function logout() {
   margin-bottom: -1px !important;
 }
 
-.el-popper {
+.el-popover {
   padding: 5px !important;
 }
 
 .tmb-container .el-menu-item:focus {
   background-color: unset !important;
   color: inherit !important;
-}
-
-.tmb-container .el-menu--horizontal>.el-menu-item.is-active,
-.tmb-container .el-menu--horizontal>.el-menu-item,
-.tmb-container .el-menu--horizontal>.el-sub-menu.is-active .el-sub-menu__title,
-.tmb-container .el-menu--horizontal>.el-sub-menu .el-sub-menu__title {
-  border-bottom: none !important;
 }
 
 .tmb-container .el-menu-item,

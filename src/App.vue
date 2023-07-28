@@ -4,7 +4,7 @@
 
     <TopMenuBar></TopMenuBar>
 
-    <div class="placeholder"></div>
+    <div v-if="$route.path !== '/'" class="placeholder"></div>
 
     <router-view></router-view>
   </div>
@@ -15,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import * as common from "./common"
-import TopMenuBar from "./components/TopMenuBar.vue"
+import * as common from "@/common"
+import TopMenuBar from "@/components/TopMenuBar.vue"
 </script>
 
 <style scoped>

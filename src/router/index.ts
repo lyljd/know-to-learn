@@ -37,4 +37,11 @@ const router = createRouter({
   routes
 })
 
+router.beforeEach((to, from, next) => {
+  store.curPath = to.path
+
+  window.scrollTo(0, 0) //设置滚动条位置到顶部
+  next()
+})
+
 export default router
