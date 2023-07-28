@@ -73,6 +73,14 @@ store.openLoginWindow = openLoginWindow
 
 const avatarPop = ref()
 const loginWindow = ref<InstanceType<typeof LoginWindow>>()
+let menu: HTMLElement
+let searchInput: HTMLElement
+let searchInner: HTMLElement
+let searchIcon: HTMLElement
+let items: NodeListOf<Element>
+let subItems: NodeListOf<Element>
+let activeItem: HTMLElement
+let searchInnerPlaceholder: HTMLStyleElement
 
 let searchKey = ref("")
 let avatarUrl = ref(localStorage.getItem("avatarUrl"))
@@ -82,20 +90,20 @@ let isTop = ref(false)
 onMounted(() => {
   if (data.special) {
     isTop.value = true
-    const menu = document.querySelector(".tmb-container .menu") as HTMLElement
-    const search = document.querySelector(".tmb-container .search-bar .el-input__wrapper") as HTMLElement
-    const searchInner = document.querySelector(".tmb-container .search-bar .el-input__wrapper .el-input__inner") as HTMLElement
-    const searchIcon = document.querySelector(".tmb-container .search .search-icon") as HTMLElement
-    const items = document.querySelectorAll(".tmb-container .el-menu-item")
-    const subItems = document.querySelectorAll(".tmb-container .el-sub-menu__title")
-    const activeItem = document.querySelector(".tmb-container .el-menu-item.is-active") as HTMLElement
-    const searchInnerPlaceholder = document.createElement("style")
+    menu = document.querySelector(".tmb-container .menu") as HTMLElement
+    searchInput = document.querySelector(".tmb-container .search-bar .el-input__wrapper") as HTMLElement
+    searchInner = document.querySelector(".tmb-container .search-bar .el-input__wrapper .el-input__inner") as HTMLElement
+    searchIcon = document.querySelector(".tmb-container .search .search-icon") as HTMLElement
+    items = document.querySelectorAll(".tmb-container .el-menu-item")
+    subItems = document.querySelectorAll(".tmb-container .el-sub-menu__title")
+    activeItem = document.querySelector(".tmb-container .el-menu-item.is-active") as HTMLElement
+    searchInnerPlaceholder = document.createElement("style")
     searchInnerPlaceholder.textContent = `.tmb-container .search-bar .el-input__wrapper .el-input__inner::placeholder {color: white;}`
     menu.style.background = "none"
     menu.style.borderBottom = "none"
     menu.style.color = "white"
-    search.style.boxShadow = "none"
-    search.style.background = "rgba(255, 255, 255, 0.25)"
+    searchInput.style.boxShadow = "none"
+    searchInput.style.background = "rgba(255, 255, 255, 0.25)"
     searchInner.style.color = "white"
     searchIcon.style.color = "white"
     items.forEach(ele => {
@@ -109,50 +117,59 @@ onMounted(() => {
     activeItem.setAttribute("style", "color: white !important; border-bottom: 2px solid white !important;")
     document.head.appendChild(searchInnerPlaceholder)
 
-    window.addEventListener("scroll", () => {
-      if (scrollY > 57) {
-        isTop.value = false
-        menu.style.background = "white"
-        menu.style.borderBottom = "1px solid #c8c9cc"
-        menu.style.color = "#303133"
-        search.style.boxShadow = "0 0 0 1px var(--el-input-border-color,var(--el-border-color)) inset"
-        search.style.backgroundColor = "white"
-        searchInner.style.color = "#303133"
-        searchIcon.style.color = "#909399"
-        items.forEach(ele => {
-          ele.setAttribute("style", "color: #303133 !important; border-bottom: none !important;")
-        })
-        setTimeout(() => {
-          subItems.forEach(ele => {
-            ele.setAttribute("style", "color: #303133 !important; border-bottom: none !important;")
-          })
-        }, 0);
-        activeItem.setAttribute("style", "color: #409EFF !important; border-bottom: 2px solid #409EFF !important;")
-        searchInnerPlaceholder.remove()
-        return
-      }
-
-      isTop.value = true
-      menu.style.background = "none"
-      menu.style.borderBottom = "none"
-      menu.style.color = "white"
-      search.style.boxShadow = "none"
-      search.style.background = "rgba(255, 255, 255, 0.25)"
-      searchInner.style.color = "white"
-      searchIcon.style.color = "white"
-      items.forEach(ele => {
-        ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
-      })
-      setTimeout(() => {
-        subItems.forEach(ele => {
-          ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
-        })
-      }, 0);
-      activeItem.setAttribute("style", "color: white !important; border-bottom: 2px solid white !important;")
-      document.head.appendChild(searchInnerPlaceholder)
-    })
+    window.addEventListener("scroll", windowScroll)
   }
 })
+
+onUnmounted(() => {
+  window.removeEventListener("scroll", windowScroll)
+  if (searchInnerPlaceholder) {
+    searchInnerPlaceholder.remove()
+  }
+})
+
+function windowScroll() {
+  if (scrollY > 57) {
+    isTop.value = false
+    menu.style.background = "white"
+    menu.style.borderBottom = "1px solid #c8c9cc"
+    menu.style.color = "#303133"
+    searchInput.style.boxShadow = "0 0 0 1px var(--el-input-border-color,var(--el-border-color)) inset"
+    searchInput.style.backgroundColor = "white"
+    searchInner.style.color = "#303133"
+    searchIcon.style.color = "#909399"
+    items.forEach(ele => {
+      ele.setAttribute("style", "color: #303133 !important; border-bottom: none !important;")
+    })
+    setTimeout(() => {
+      subItems.forEach(ele => {
+        ele.setAttribute("style", "color: #303133 !important; border-bottom: none !important;")
+      })
+    }, 0);
+    activeItem.setAttribute("style", "color: #409EFF !important; border-bottom: 2px solid #409EFF !important;")
+    searchInnerPlaceholder.remove()
+    return
+  }
+
+  isTop.value = true
+  menu.style.background = "none"
+  menu.style.borderBottom = "none"
+  menu.style.color = "white"
+  searchInput.style.boxShadow = "none"
+  searchInput.style.background = "rgba(255, 255, 255, 0.25)"
+  searchInner.style.color = "white"
+  searchIcon.style.color = "white"
+  items.forEach(ele => {
+    ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
+  })
+  setTimeout(() => {
+    subItems.forEach(ele => {
+      ele.setAttribute("style", "color: white !important; border-bottom: none !important;")
+    })
+  }, 0);
+  activeItem.setAttribute("style", "color: white !important; border-bottom: 2px solid white !important;")
+  document.head.appendChild(searchInnerPlaceholder)
+}
 
 function toSearch() {
   if (searchKey.value.trim() === '') {
@@ -312,8 +329,4 @@ function logout() {
 .tmb-container .search-bar .el-input__wrapper {
   border-radius: 10px !important;
 }
-
-/* .tmb-container .search-bar .el-input__wrapper .el-input__inner::placeholder {
-  color: #909399;
-} */
 </style>
