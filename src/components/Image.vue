@@ -1,29 +1,31 @@
 <template>
   <div
     :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', border: border ? '1px solid #dcdfe6' : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '' }"
-    class="Image-container" :class="customClass" @click="openImgUpload">
+    class="Image-container" @click="!preview && uploadUrl !== '' ? openImgUpload() : null">
     <el-image :src="url" :preview-src-list="preview && uploadUrl === '' ? [url] : []" :fit="contain ? 'contain' : ''"
-      :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '', cursor: uploadUrl !== '' ? 'pointer' : 'default', opacity: imgUploadPercent !== 0 ? 0.5 : 1 }"
-      class="img">
+      :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '', cursor: uploadUrl !== '' ? 'pointer' : 'default' }"
+      :class="customClass" class="img">
       <template #error>
         <div :style="{ borderRadius: round ? '5px' : '' }" class="default">{{ loadFailInfo }}</div>
       </template>
     </el-image>
   </div>
 
-  <el-upload v-if="uploadUrl !== ''" :before-upload="beforeImgUpload" :on-remove="onImgUploadRemove"
-    :on-change="onImgUploadChange" :on-progress="onImgUploadProgress" :on-success="onImgUploadSuccess"
-    :on-error="onImgUploadError" ref="imgUpload" :action="uploadUrl" accept="image/*" v-show="false"></el-upload>
+  <el-upload :http-request="httpRequest" :before-upload="beforeImgUpload" ref="imgUpload" :method="uploadMethod"
+    :action="uploadUrl" accept="image/*" v-show="false"></el-upload>
 </template>
 
 <script setup lang="ts">
 import { UploadInstance } from 'element-plus'
 import * as common from "../common"
+import * as API from '@/api/user'
+import axios from 'axios'
 
 const stf = defineEmits<{
   (cen: "recImgUrl", imgUrl: string): void
-  (cen: "recImgUploadPercent", imgUploadPercent: number): void
+  (cen: "recOpenUploadFc", f: Function): void
 }>()
+stf("recOpenUploadFc", openImgUpload)
 
 const data = withDefaults(defineProps<{
   url: string,
@@ -36,6 +38,7 @@ const data = withDefaults(defineProps<{
   circle: boolean,
   customClass: string,
   uploadUrl: string,
+  uploadMethod: string,
   uploadMaxSize: number, //单位：MB
   loadFailInfo: string,
 }>(), {
@@ -48,25 +51,15 @@ const data = withDefaults(defineProps<{
   circle: false,
   customClass: "",
   uploadUrl: "",
-  uploadMaxSize: 10,
+  uploadMethod: "post",
+  uploadMaxSize: 1,
   loadFailInfo: "加载失败",
 })
 
 const imgUpload = ref<UploadInstance>()
 
-let imgUrl = ref(data.url)
-let preImgUrl = ref(data.url)
-let preImgId = ref(0)
-let imgUploadPercent = ref(0)
-
 function openImgUpload() {
-  if (data.uploadUrl !== "") {
-    if (imgUploadPercent.value !== 0) {
-      common.showError("图片上传时禁止修改")
-      return
-    }
-    imgUpload.value?.$el.querySelector('input').click()
-  }
+  imgUpload.value?.$el.querySelector('input').click()
 }
 
 function beforeImgUpload(rawFile: any) {
@@ -77,35 +70,38 @@ function beforeImgUpload(rawFile: any) {
   return true
 }
 
-function onImgUploadRemove() {
-  imgUrl.value = preImgUrl.value
-}
+function httpRequest(option: any) {
+  const fileName: string = option.file.name
+  const fileSuffix = fileName.substring(fileName.lastIndexOf("."))
+  const contentType = option.file.type
+  let uploadUrl: string
+  let resourceUrl: string
+  API.getAvatarUploadAndResourceUrl(fileSuffix)
+    .then((res) => {
+      if (res.code !== 200) {
+        common.showError(res.message)
+        return
+      }
 
-function onImgUploadChange(file: any) {
-  if (file.uid !== preImgId.value) {
-    preImgId.value = file.uid
-    imgUrl.value = URL.createObjectURL(file.raw)
-  }
-}
+      uploadUrl = res.data.requestURL
+      resourceUrl = res.data.resourceURL
 
-function onImgUploadProgress(event: any) {
-  imgUploadPercent.value = Math.floor(event.percent)
-  stf('recImgUploadPercent', imgUploadPercent.value)
-}
-
-function onImgUploadSuccess() {
-  preImgUrl.value = imgUrl.value
-  imgUploadPercent.value = 0
-
-  stf('recImgUrl', imgUrl.value)
-  stf('recImgUploadPercent', 0)
-}
-
-function onImgUploadError() {
-  imgUrl.value = preImgUrl.value
-  imgUploadPercent.value = 0
-  stf('recImgUploadPercent', 0)
-  common.showError("图片上传失败")
+      axios({
+        method: option.method,
+        url: uploadUrl,
+        data: option.file,
+        headers: { 'Content-Type': `${contentType}` },
+      })
+        .then(() => {
+          stf("recImgUrl", resourceUrl)
+        })
+        .catch((error) => {
+          common.showError(error.message)
+        })
+    })
+    .catch((error) => {
+      common.showError(error.message)
+    })
 }
 </script>
 

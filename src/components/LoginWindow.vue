@@ -240,7 +240,7 @@ function loginAPI(para: LoginAPIPara) {
 function saveLoginInfo(li: LoginInfo) {
   localStorage.setItem("nickname", li.nickname)
   localStorage.setItem("avatarUrl", li.avatarUrl)
-  localStorage.setItem("token", li.token)
+  localStorage.setItem("token", "Bearer "+li.token)
 }
 
 function showLoginSuccess(nickname: string) {

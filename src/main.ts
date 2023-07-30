@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import { createPinia } from 'pinia'
 import router from './router'
 import './normalize.css'
 import './main.css'
@@ -12,6 +13,8 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import Image from "./components/Image.vue"
 
 const app = createApp(App)
+const pinia = createPinia()
+app.use(pinia)
 app.use(router)
 app.use(ElementPlus)
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

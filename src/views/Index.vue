@@ -3,7 +3,8 @@
 
   <div class="i-container">
     <div style="display: flex; flex-direction: column;">
-      <el-carousel :interval="5000" :pause-on-hover="false" arrow="never" indicator-position="none" style="height: 100vh;">
+      <el-carousel :interval="5000" :pause-on-hover="false" arrow="never" indicator-position="none"
+        style="height: 100vh;">
         <el-carousel-item v-for="p in homePages" style="height: 100vh;">
           <div :style="{ backgroundImage: `url(${p.imgUrl})` }" class="homePage">
             <div class="slogan">
@@ -16,6 +17,14 @@
       <transition enterActiveClass="animate__fadeInDown" leaveActiveClass="animate__fadeOutUp">
         <div v-show="moreShow" class="more animate__animated">下滑查看更多↓</div>
       </transition>
+    </div>
+
+    <div class="recommendation">
+      <div class="header">推荐课程</div>
+      <div class="body">
+        <CourseCard v-for="r in recommendations" :data="r"></CourseCard>
+        <CourseRefreshBtn @click="refreshCourse" id="rc-btn"></CourseRefreshBtn>
+      </div>
     </div>
 
     <div style="height: 170px;" class="carousel">
@@ -33,13 +42,18 @@
         </div>
       </div>
     </div>
+
+    <IndexFooter></IndexFooter>
   </div>
 </template>
 
 <script setup lang="ts">
 import * as API from '@/api/common'
-import * as common from '@/common'
 import TopMenuBar from '@/components/TopMenuBar.vue'
+import CourseCard from '@/components/CourseCard.vue'
+import CourseRefreshBtn from '@/components/CourseRefreshBtn.vue'
+import * as common from '@/common'
+import IndexFooter from '@/components/IndexFooter.vue'
 
 type HomePage = {
   firstSlogan: string
@@ -52,6 +66,15 @@ type Chief = {
   avatar: string,
 }
 
+type Course = {
+  coverUrl: string,
+  courseId: number,
+  courseName: string,
+  orgId: number,
+  orgName: string,
+  publishTime: number,
+}
+
 const homePages = ref<HomePage[]>([
   { firstSlogan: "知学随学", secondSlogan: "智慧之舟展翅", imgUrl: "../../public/bg1.jpg" },
   { firstSlogan: "智行并进", secondSlogan: "探索学海壮阔", imgUrl: "../../public/bg2.jpg" },
@@ -60,6 +83,7 @@ const homePages = ref<HomePage[]>([
 
 let chiefs = ref<Chief[]>([{ avatar: "", name: "null" }])
 let moreShow = ref(true)
+let recommendations = ref<Course[]>([{ coverUrl: "", courseId: -1, courseName: "null", orgId: -1, orgName: "null", publishTime: -1 }])
 
 onMounted(() => {
   window.addEventListener('scroll', () => {
@@ -69,27 +93,61 @@ onMounted(() => {
       moreShow.value = true
     }
   })
+
+  getRecommendation()
+  getChiefs()
 })
+
+function getRecommendation() {
+  API.getRecommendation()
+    .then((res) => {
+      if (res.code !== 200) {
+        common.showError("获取推荐课程失败")
+        console.log(res.message)
+        return
+      }
+
+      recommendations.value = res.data
+    })
+    .catch((error) => {
+      common.showError("获取推荐课程失败")
+      console.log(error.message)
+    })
+}
 
 function getChiefs() {
   API.getChief()
     .then((res) => {
       if (res.code !== 200) {
+        common.showError("获取主创成员失败")
+        console.log(res.message)
         return
       }
 
       chiefs.value = res.data
     })
     .catch((error) => {
-      common.showError(error.message)
+      common.showError("获取主创成员失败")
+      console.log(error.message)
     })
 }
-getChiefs()
+
+function refreshCourse() {
+  const rcBtn = document.getElementById("rc-btn") as HTMLButtonElement
+  common.btnCD(rcBtn, 1, true)
+  getRecommendation()
+}
 </script>
 
 <style scoped>
-.i-container>* {
+.i-container {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 20px;
+}
+
+.i-container>*:not(:last-child) {
+  margin-bottom: 40px;
 }
 
 .i-container .homePage {
@@ -121,6 +179,23 @@ getChiefs()
   color: white;
   cursor: default;
   align-self: center;
+}
+
+.i-container .recommendation {
+  width: 1140px;
+  align-self: center;
+}
+
+.i-container .recommendation .header {
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.i-container .recommendation .body {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
 .i-container .carousel .header {

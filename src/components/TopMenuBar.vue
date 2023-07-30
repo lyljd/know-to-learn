@@ -7,7 +7,6 @@
       </div>
 
       <el-menu-item index="/">首页</el-menu-item>
-      <el-menu-item index="/hot">热门</el-menu-item>
       <el-sub-menu>
         <template #title>方向</template>
         <el-menu-item index="/direction/backend">后端开发</el-menu-item>
@@ -29,22 +28,25 @@
 
       <div class="login-btn" @click="openLoginWindow()" v-if="!store.isLogin">登录</div>
 
-      <el-popover :width="250" ref="avatarPop" :show-arrow=false>
+      <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
         <template #reference>
-          <el-avatar class="avatar" v-if="store.isLogin" :src="avatarUrl" @error="true">
+          <el-avatar class="avatar" v-if="store.isLogin" :src="store.avatarUrl" @error="true">
             <img src="../../public/default-avatar.png" />
           </el-avatar>
         </template>
 
         <div class="avatar-hover-window">
           <div class="nickname">
-            {{ nickname }}
+            {{ store.nickname }}
           </div>
 
           <div class="divider"></div>
 
           <ul class="option">
-            <li>个人中心</li>
+            <li @click="common.ToNewPage('/message')">消息中心</li>
+            <li @click="common.ToNewPage('/user')">用户中心</li>
+            <li v-if="store.role === 'org'" @click="common.ToNewPage('/org')">机构中心</li>
+            <li v-if="store.role === 'admin'" @click="common.ToNewPage('/admin')">后台管理</li>
             <li @click="logout">退出登录</li>
           </ul>
         </div>
@@ -60,6 +62,7 @@ import * as common from "@/common"
 import { useRoute } from 'vue-router'
 import { useStore } from "@/store"
 import LoginWindow from "@/components/LoginWindow.vue"
+import * as API from '@/api/user'
 
 const data = withDefaults(defineProps<{
   special: boolean,
@@ -83,14 +86,13 @@ let activeItem: HTMLElement
 let searchInnerPlaceholder: HTMLStyleElement
 
 let searchKey = ref("")
-let avatarUrl = ref(localStorage.getItem("avatarUrl"))
-let nickname = ref(localStorage.getItem("nickname") ? localStorage.getItem("nickname") : "null")
 let isTop = ref(false)
 
 onMounted(() => {
+  menu = document.querySelector(".tmb-container .menu") as HTMLElement
+
   if (data.special) {
     isTop.value = true
-    menu = document.querySelector(".tmb-container .menu") as HTMLElement
     searchInput = document.querySelector(".tmb-container .search-bar .el-input__wrapper") as HTMLElement
     searchInner = document.querySelector(".tmb-container .search-bar .el-input__wrapper .el-input__inner") as HTMLElement
     searchIcon = document.querySelector(".tmb-container .search .search-icon") as HTMLElement
@@ -119,6 +121,8 @@ onMounted(() => {
 
     window.addEventListener("scroll", windowScroll)
   }
+
+  window.addEventListener("scroll", topMenuBarScroll)
 })
 
 onUnmounted(() => {
@@ -126,6 +130,8 @@ onUnmounted(() => {
   if (searchInnerPlaceholder) {
     searchInnerPlaceholder.remove()
   }
+
+  window.removeEventListener("scroll", topMenuBarScroll)
 })
 
 function windowScroll() {
@@ -171,6 +177,10 @@ function windowScroll() {
   document.head.appendChild(searchInnerPlaceholder)
 }
 
+function topMenuBarScroll() {
+  menu.style.marginLeft = -document.documentElement.scrollLeft.toString() + "px"
+}
+
 function toSearch() {
   if (searchKey.value.trim() === '') {
     common.showError("关键字不能为空")
@@ -181,25 +191,37 @@ function toSearch() {
 
 function openLoginWindow() {
   loginWindow.value?.show((au: string, nn: string) => {
-    avatarUrl.value = au
-    nickname.value = nn
+    store.avatarUrl = au
+    store.nickname = nn
   })
-}
-
-function clearLoginStorage() {
-  localStorage.removeItem("uid")
-  localStorage.removeItem("nickname")
-  localStorage.removeItem("avatarUrl")
-  localStorage.removeItem("token")
-  localStorage.removeItem("refreshToken")
 }
 
 function logout() {
   avatarPop.value.hide()
-  clearLoginStorage()
+  common.clearLoginStorage()
   store.isLogin = false
+  store.role = ""
   if (route.meta.needLogin) {
     location.href = `/401?from=${location.pathname}`
+  }
+}
+
+function onAvatarPopShow() {
+  if (store.role === "") {
+    API.getPersonalInfo()
+      .then((res) => {
+        if (res.code !== 200) {
+          common.showError("获取身份信息失败")
+          console.log(res.message)
+          return
+        }
+
+        store.role = res.data.role
+      })
+      .catch((error) => {
+        common.showError("获取身份信息失败")
+        console.log(error.message)
+      })
   }
 }
 </script>

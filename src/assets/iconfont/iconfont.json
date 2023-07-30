@@ -6,11 +6,32 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "11870505",
+      "name": "warning",
+      "font_class": "warning",
+      "unicode": "e63f",
+      "unicode_decimal": 58943
+    },
+    {
+      "icon_id": "22064301",
+      "name": "color-success",
+      "font_class": "success",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    },
+    {
       "icon_id": "11488017",
       "name": "cry",
       "font_class": "cry",
       "unicode": "e74a",
       "unicode_decimal": 59210
+    },
+    {
+      "icon_id": "36651197",
+      "name": "智能学习平台-copy",
+      "font_class": "ktl-2",
+      "unicode": "e74b",
+      "unicode_decimal": 59211
     },
     {
       "icon_id": "6988587",
