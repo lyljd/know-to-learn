@@ -18,6 +18,8 @@ const setNickname = (nickname: string) => apiInstance.post("/api/user/update/nic
 
 const getAvatarUploadAndResourceUrl = (suffix: string) => apiInstance.post("/api/user/upload/avatar", { suffix: suffix }).then(res => res.data)
 
+const getNewMsgNum = () => apiInstance.get("/api/user/stationMessage/count").then(res => res.data)
+
 export {
   getCaptcha,
   verifyCaptcha,
@@ -28,4 +30,5 @@ export {
   setUsername,
   setNickname,
   getAvatarUploadAndResourceUrl,
+  getNewMsgNum,
 }

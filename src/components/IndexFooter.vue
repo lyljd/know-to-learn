@@ -21,13 +21,13 @@ const store = useStore()
 
 const fsPara = {
   title: "机构入驻",
-  bzUrl: "/api/org/apply",
-  getUploadUrl: "/api/org/submit/materials",
+  bzUrl: "/api/user/org/apply",
+  getUploadUrl: "/api/user/org/submit/materials",
   topicAlias: "orgName",
   contentAlias: "introduction",
   fileListStrAlias: "materials",
   topicPlaceholder: "请输入机构名",
-  contentPlaceholder: "请输入机构信息，并在下方上传必要的图片",
+  contentPlaceholder: "请输入机构信息，并上传机构相关图片（可选）",
   topicCheckFailMsg: "机构名不能为空",
   contentCheckFailMsg: "机构信息不能为空",
   succMsg: "提交成功，申请结果将通过系统消息发送～",

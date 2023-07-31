@@ -53,6 +53,7 @@ import { ElNotification } from 'element-plus'
 type LoginInfo = {
   nickname: string,
   avatarUrl: string,
+  role: string,
   token: string,
 }
 
@@ -212,6 +213,7 @@ function loginAPI(para: LoginAPIPara) {
       let li: LoginInfo = {
         nickname: res.data.userInfo.nickname,
         avatarUrl: res.data.userInfo.avatar,
+        role: res.data.userInfo.role,
         token: res.data.token,
       }
 
@@ -240,7 +242,8 @@ function loginAPI(para: LoginAPIPara) {
 function saveLoginInfo(li: LoginInfo) {
   localStorage.setItem("nickname", li.nickname)
   localStorage.setItem("avatarUrl", li.avatarUrl)
-  localStorage.setItem("token", "Bearer "+li.token)
+  localStorage.setItem("role", li.role)
+  localStorage.setItem("token", "Bearer " + li.token)
 }
 
 function showLoginSuccess(nickname: string) {

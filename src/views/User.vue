@@ -22,9 +22,9 @@
           <span @click="setPassword" class="btn">{{ pi?.password ? "修改密码" : "设置密码" }}</span>
         </div>
 
-        <el-divider />
+        <el-divider v-if="common.getRole() === 'user'" />
 
-        <div>
+        <div v-if="common.getRole() === 'user'">
           <span>
             <svg class="icon-symbol" aria-hidden="true">
               <use :xlink:href="'#el-icon-success'"></use>

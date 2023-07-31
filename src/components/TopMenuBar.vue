@@ -8,10 +8,10 @@
 
       <el-menu-item index="/">首页</el-menu-item>
       <el-sub-menu>
-        <template #title>方向</template>
-        <el-menu-item index="/direction/backend">后端开发</el-menu-item>
-        <el-menu-item index="/direction/frontend">前端开发</el-menu-item>
-        <el-menu-item index="/direction/mobile">移动开发</el-menu-item>
+        <template #title>分类</template>
+        <el-menu-item index="/category/backend">后端开发</el-menu-item>
+        <el-menu-item index="/category/frontend">前端开发</el-menu-item>
+        <el-menu-item index="/category/mobile">移动开发</el-menu-item>
       </el-sub-menu>
 
       <div class="flex-grow" />
@@ -28,7 +28,7 @@
 
       <div class="login-btn" @click="openLoginWindow()" v-if="!store.isLogin">登录</div>
 
-      <el-popover :width="250" @show="onAvatarPopShow" ref="avatarPop" :show-arrow=false>
+      <el-popover @show="onAvatarPopShow" :width="250" ref="avatarPop" :show-arrow=false>
         <template #reference>
           <el-avatar class="avatar" v-if="store.isLogin" :src="store.avatarUrl" @error="true">
             <img src="../../public/default-avatar.png" />
@@ -43,10 +43,12 @@
           <div class="divider"></div>
 
           <ul class="option">
-            <li @click="common.ToNewPage('/message')">消息中心</li>
+
+            <li @click="common.ToNewPage('/message')"><el-badge :hidden="newMsgNum === 0"
+                :value="newMsgNum">消息中心</el-badge></li>
             <li @click="common.ToNewPage('/user')">用户中心</li>
-            <li v-if="store.role === 'org'" @click="common.ToNewPage('/org')">机构中心</li>
-            <li v-if="store.role === 'admin'" @click="common.ToNewPage('/admin')">后台管理</li>
+            <li v-if="common.getRole() === 'org'" @click="common.ToNewPage('/org/home')">机构中心</li>
+            <li v-if="common.getRole() === 'admin'" @click="common.ToNewPage('/admin/org')">管理中心</li>
             <li @click="logout">退出登录</li>
           </ul>
         </div>
@@ -87,6 +89,7 @@ let searchInnerPlaceholder: HTMLStyleElement
 
 let searchKey = ref("")
 let isTop = ref(false)
+let newMsgNum = ref(0)
 
 onMounted(() => {
   menu = document.querySelector(".tmb-container .menu") as HTMLElement
@@ -200,29 +203,26 @@ function logout() {
   avatarPop.value.hide()
   common.clearLoginStorage()
   store.isLogin = false
-  store.role = ""
   if (route.meta.needLogin) {
     location.href = `/401?from=${location.pathname}`
   }
 }
 
 function onAvatarPopShow() {
-  if (store.role === "") {
-    API.getPersonalInfo()
-      .then((res) => {
-        if (res.code !== 200) {
-          common.showError("获取身份信息失败")
-          console.log(res.message)
-          return
-        }
+  API.getNewMsgNum()
+    .then((res) => {
+      if (res.code !== 200) {
+        console.log(res.message)
+        common.showError("获取未读消息失败")
+        return
+      }
 
-        store.role = res.data.role
-      })
-      .catch((error) => {
-        common.showError("获取身份信息失败")
-        console.log(error.message)
-      })
-  }
+      newMsgNum.value = res.data
+    })
+    .catch((error) => {
+      console.log(error.message)
+      common.showError("获取未读消息失败")
+    })
 }
 </script>
 
@@ -320,6 +320,10 @@ function onAvatarPopShow() {
 
 .el-popover {
   padding: 5px !important;
+}
+
+.avatar-hover-window .option .el-badge__content {
+  right: 5px !important;
 }
 
 .tmb-container .el-menu-item:focus {

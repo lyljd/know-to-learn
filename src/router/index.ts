@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router"
 import { useStore } from "../store"
+import * as common from '@/common'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -22,6 +23,15 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   {
+    path: "/403",
+    component: () => import("../views/Error.vue"),
+    meta: {
+      code: 403,
+      msg: "未授权",
+    }
+  },
+
+  {
     path: "/user",
     component: () => import("../views/User.vue"),
     meta: {
@@ -40,20 +50,30 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   {
-    path: "/org",
+    path: "/org/home",
     component: () => import("../views/Org.vue"),
+    children: [
+      { path: "/org/home", component: () => import("../views/Org/Home.vue") },
+      { path: "/org/course", component: () => import("../views/Org/Course.vue") },
+    ],
     meta: {
       title: "机构中心",
       needLogin: true,
+      role: "org",
     }
   },
 
   {
-    path: "/admin",
+    path: "/admin/org",
     component: () => import("../views/Admin.vue"),
+    children: [
+      { path: "/admin/org", component: () => import("../views/Admin/Org.vue") },
+      { path: "/admin/course", component: () => import("../views/Admin/Course.vue") },
+    ],
     meta: {
-      title: "后台管理",
+      title: "管理中心",
       needLogin: true,
+      role: "admin",
     }
   },
 ]
@@ -67,6 +87,11 @@ router.beforeEach((to: any, from: any, next: Function) => {
   const store = useStore()
   if (to.meta.needLogin && !store.isLogin) {
     next(`/401?from=${to.href}`)
+    return
+  }
+
+  if (to.meta.role && common.getRole() !== to.meta.role) {
+    next(`/403?from=${to.href}`)
     return
   }
 

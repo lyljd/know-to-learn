@@ -190,7 +190,18 @@ function ToNewPage(url: string) {
 function clearLoginStorage() {
   localStorage.removeItem("nickname")
   localStorage.removeItem("avatarUrl")
+  localStorage.removeItem("role")
   localStorage.removeItem("token")
+}
+
+function getRole(): string {
+  const role = localStorage.getItem("role")
+  return role ? role : ""
+}
+
+function getNickname(): string {
+  const nickname = localStorage.getItem("nickname")
+  return nickname ? nickname : ""
 }
 
 export {
@@ -214,4 +225,6 @@ export {
   ToOrg,
   ToNewPage,
   clearLoginStorage,
+  getRole,
+  getNickname,
 }
