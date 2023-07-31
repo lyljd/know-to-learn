@@ -6,7 +6,7 @@
       <a href="https://github.com/lyljd/know-to-learn" target="__blank">Front-end</a>
       <a href="https://github.com/L-XRay/know-to-learn" target="__blank">Back-end</a>
     </div>
-    <span @click="store.openFSWindow(fsPara)" class="org">机构入驻</span>
+    <span @click="orgApply" class="org">机构入驻</span>
   </div>
 
   <FeedbackSubmissionWindow></FeedbackSubmissionWindow>
@@ -15,18 +15,32 @@
 <script setup lang="ts">
 import FeedbackSubmissionWindow from '@/components/FeedbackSubmissionWindow.vue'
 import { useStore } from '@/store'
+import * as common from '@/common'
 
 const store = useStore()
 
 const fsPara = {
   title: "机构入驻",
-  bzUrl: "",
+  bzUrl: "/api/org/apply",
+  getUploadUrl: "/api/org/submit/materials",
+  topicAlias: "orgName",
+  contentAlias: "introduction",
+  fileListStrAlias: "materials",
   topicPlaceholder: "请输入机构名",
   contentPlaceholder: "请输入机构信息，并在下方上传必要的图片",
   topicCheckFailMsg: "机构名不能为空",
   contentCheckFailMsg: "机构信息不能为空",
   succMsg: "提交成功，申请结果将通过系统消息发送～",
   afterSuccDo: () => { },
+}
+
+function orgApply() {
+  if (!store.isLogin) {
+    common.showInfo("请登录")
+    store.openLoginWindow()
+    return
+  }
+  store.openFSWindow(fsPara)
 }
 </script>
 

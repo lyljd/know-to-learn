@@ -72,7 +72,7 @@ function beforeImgUpload(rawFile: any) {
 
 function httpRequest(option: any) {
   const fileName: string = option.file.name
-  const fileSuffix = fileName.substring(fileName.lastIndexOf("."))
+  const fileSuffix = fileName.substring(fileName.lastIndexOf(".") + 1)
   const contentType = option.file.type
   let uploadUrl: string
   let resourceUrl: string

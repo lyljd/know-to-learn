@@ -21,8 +21,8 @@
     </div>
 
     <template #footer>
-      <el-button @click="closeMainWindow">{{ data.cancelButtonText }}</el-button>
-      <el-button @click="submit" type="primary">{{ data.confirmButtonText }}</el-button>
+      <el-button id="fsw-cancel" @click="closeMainWindow">{{ data.cancelButtonText }}</el-button>
+      <el-button id="fsw-submit" @click="submit" type="primary">{{ data.confirmButtonText }}</el-button>
     </template>
   </el-dialog>
 
@@ -35,10 +35,16 @@
 import { UploadInstance, ElInput } from 'element-plus'
 import { useStore } from "../store"
 import * as common from "../common"
+import * as API from '@/api/common'
+import axios from "axios"
 
 type Data = {
   title: string,
   bzUrl: string,
+  getUploadUrl: string,
+  topicAlias: string,
+  contentAlias: string,
+  fileListStrAlias: string,
   topicPlaceholder: string,
   contentPlaceholder: string,
   cancelButtonText: string,
@@ -52,6 +58,10 @@ type Data = {
 type Para = {
   title: string,
   bzUrl: string,
+  getUploadUrl: string,
+  topicAlias: string,
+  contentAlias: string,
+  fileListStrAlias: string,
   topicPlaceholder?: string,
   contentPlaceholder?: string,
   cancelButtonText?: string,
@@ -78,6 +88,10 @@ let previewImgUrl = ref("")
 let data: Data = reactive({
   title: "",
   bzUrl: "",
+  getUploadUrl: "",
+  topicAlias: "",
+  contentAlias: "",
+  fileListStrAlias: "",
   topicPlaceholder: "",
   contentPlaceholder: "",
   cancelButtonText: "取消",
@@ -91,6 +105,10 @@ let data: Data = reactive({
 function openMainWindow(p: Para) {
   data.title = p.title
   data.bzUrl = p.bzUrl
+  data.getUploadUrl = p.getUploadUrl
+  data.topicAlias = p.topicAlias
+  data.contentAlias = p.contentAlias
+  data.fileListStrAlias = p.fileListStrAlias
 
   if (p.topicPlaceholder) {
     data.topicPlaceholder = p.topicPlaceholder
@@ -133,7 +151,7 @@ function openPreviewWindow(imgUrl: string) {
   previewWindowVisible.value = true
 }
 
-function submit() {
+async function submit() {
   topic.value = topic.value.trim()
   if (topic.value === "") {
     topicEle.value?.focus()
@@ -148,12 +166,40 @@ function submit() {
     return
   }
 
-  // 发送topic，msg和fileList的长度至bzUrl，后端返回长度数量的oss上传链接（后端往数据库插入记录，生成的多个文件名以分号隔开存成一个字符串），上传中途使footer的btns禁止
-  console.log(topic.value, content.value, fileList.value)
+  const cancelBtn = document.getElementById("fsw-cancel") as HTMLButtonElement
+  const submitBtn = document.getElementById("fsw-submit") as HTMLButtonElement
 
-  data.afterSuccDo()
-  closeMainWindow()
-  common.showSuccess(data.succMsg)
+  cancelBtn.disabled = true
+  cancelBtn.classList.add('is-disabled')
+  submitBtn.disabled = true
+  submitBtn.classList.add('is-disabled')
+
+  const rss = await uploadImages(fileList.value)
+  API.fsbusiness(data.bzUrl, {
+    [data.topicAlias]: topic.value,
+    [data.contentAlias]: content.value,
+    [data.fileListStrAlias]: rss.join(";")
+  })
+    .then((res) => {
+      if (res.code !== 200) {
+        console.log(res.message)
+        common.showError("提交失败")
+        return
+      }
+
+      data.afterSuccDo()
+      closeMainWindow()
+      common.showSuccess(data.succMsg)
+    })
+    .catch((error) => {
+      console.log(error.message)
+      common.showError("提交失败")
+    })
+
+  cancelBtn.disabled = false
+  cancelBtn.classList.remove('is-disabled')
+  submitBtn.disabled = false
+  submitBtn.classList.remove('is-disabled')
 }
 
 function onExceed() {
@@ -165,6 +211,40 @@ function onChange(file: any) {
     uploadRef.value!.handleRemove(file)
     common.showError("上传的图片大小不能超过10M")
   }
+}
+
+async function uploadImages(fileList: any[]): Promise<string[]> {
+  let resourceUrlArray: string[] = [];
+
+  for (const f of fileList) {
+    const fileName = f.name;
+
+    try {
+      const res = await API.getUploadAndResourceUrl(data.getUploadUrl, fileName.substring(fileName.lastIndexOf(".") + 1));
+
+      if (res.code !== 200) {
+        console.log(res.message);
+        common.showError(`图片"${fileName}"上传失败`);
+        continue;
+      }
+
+      const resourceUrl = res.data.resourceURL;
+
+      await axios({
+        method: "put",
+        url: res.data.requestURL,
+        data: f.raw,
+        headers: { 'Content-Type': `${f.raw.type}` },
+      });
+
+      resourceUrlArray.push(resourceUrl);
+    } catch (error: any) {
+      console.log(error.message);
+      common.showError(`图片"${fileName}"上传失败`);
+    }
+  }
+
+  return resourceUrlArray;
 }
 </script>
 

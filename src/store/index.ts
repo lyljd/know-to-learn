@@ -4,6 +4,10 @@ import * as common from "../common"
 type Para = {
   title: string,
   bzUrl: string,
+  getUploadUrl: string,
+  topicAlias: string,
+  contentAlias: string,
+  fileListStrAlias: string,
   topicPlaceholder?: string,
   contentPlaceholder?: string,
   cancelButtonText?: string,
