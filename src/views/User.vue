@@ -48,7 +48,7 @@
           <span>
             <span>头像</span>
           </span>
-          <Image customClass="image-upload" :url="pi?.avatar" :w="40" :h="40" @recOpenUploadFc="recOpenUploadFc"
+          <Image :url="pi?.avatar" :w="40" :h="40" uploadUrl="/api/user/upload/avatar" @recOpenUploadFc="recOpenUploadFc"
             @recImgUrl="recImgUrl" uploadMethod="put" preview circle></Image>
           <span @click="setAvatar" class="btn">修改头像</span>
         </div>
@@ -177,6 +177,11 @@ function setUsername() {
     inputErrorMessage: '用户名长度至少有1位',
   })
     .then(({ value }) => {
+      value = value.trim()
+      if (value.length <= 0) {
+        common.showError("用户名不能为空")
+        return
+      }
       if (value === pi.value!.username) {
         common.showError("新用户名与原用户名相同")
         return
@@ -207,6 +212,11 @@ function setNickname() {
     inputErrorMessage: '昵称长度至少有1位',
   })
     .then(({ value }) => {
+      value = value.trim()
+      if (value.length <= 0) {
+        common.showError("昵称不能为空")
+        return
+      }
       if (value === pi.value!.nickname) {
         common.showError("新昵称与原昵称相同")
         return

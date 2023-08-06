@@ -2,7 +2,7 @@
   <div
     :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', border: border ? '1px solid #dcdfe6' : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '' }"
     class="Image-container" @click="!preview && uploadUrl !== '' ? openImgUpload() : null">
-    <el-image :src="url" :preview-src-list="preview && uploadUrl === '' ? [url] : []" :fit="contain ? 'contain' : ''"
+    <el-image :src="url" :preview-src-list="preview ? [url] : []" :fit="contain ? 'contain' : ''"
       :style="{ width: w ? `${w}px` : '', height: h ? `${h}px` : '', borderRadius: (round || circle) ? (circle ? '50%' : '5px') : '', cursor: uploadUrl !== '' ? 'pointer' : 'default' }"
       :class="customClass" class="img">
       <template #error>
@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { UploadInstance } from 'element-plus'
 import * as common from "../common"
-import * as API from '@/api/user'
+import * as API from '@/api/common'
 import axios from 'axios'
 
 const stf = defineEmits<{
@@ -76,7 +76,7 @@ function httpRequest(option: any) {
   const contentType = option.file.type
   let uploadUrl: string
   let resourceUrl: string
-  API.getAvatarUploadAndResourceUrl(fileSuffix)
+  API.getUploadAndResourceUrl(data.uploadUrl, fileSuffix)
     .then((res) => {
       if (res.code !== 200) {
         common.showError(res.message)

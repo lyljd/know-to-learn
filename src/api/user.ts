@@ -16,8 +16,6 @@ const setUsername = (username: string) => apiInstance.post("/api/user/update/use
 
 const setNickname = (nickname: string) => apiInstance.post("/api/user/update/nickname", { nickname: nickname }).then(res => res.data)
 
-const getAvatarUploadAndResourceUrl = (suffix: string) => apiInstance.post("/api/user/upload/avatar", { suffix: suffix }).then(res => res.data)
-
 const getNewMsgNum = () => apiInstance.get("/api/user/stationMessage/count").then(res => res.data)
 
 export {
@@ -29,6 +27,5 @@ export {
   setPassword,
   setUsername,
   setNickname,
-  getAvatarUploadAndResourceUrl,
   getNewMsgNum,
 }

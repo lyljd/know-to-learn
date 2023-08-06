@@ -76,6 +76,24 @@ const routes: Array<RouteRecordRaw> = [
       role: "admin",
     }
   },
+
+  {
+    path: "/course/:id",
+    component: () => import("../views/Course.vue"),
+    children: [
+      { path: "/course/:id", component: () => import("../views/Course/Chapter.vue") },
+    ]
+  },
+
+  {
+    path: "/org/:id",
+    component: () => import("../views/OrgExpose.vue"),
+  },
+
+  {
+    path: "/video/:id",
+    component: () => import("../views/Video.vue"),
+  },
 ]
 
 const router = createRouter({

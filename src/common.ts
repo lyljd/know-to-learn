@@ -107,6 +107,19 @@ function timestampFormatterStandardExcludeSecondOrAndYear(timestamp: number): st
   return ret
 } //返回日期格式：月-日 时:分；若时间戳不为今年，则为：年-月-日 时:分
 
+function timestampFormatterStandardExcludeHMSOrAndYear(timestamp: number): string {
+  let d = timestampFormatter(timestamp)
+  let dn = timestampFormatter(Date.now())
+
+  let ret = `${add0(d.month)}-${add0(d.day)}`
+
+  if (d.year < dn.year) {
+    ret = `${d.year}-` + ret
+  }
+
+  return ret
+} //返回日期格式：月-日；若时间戳不为今年，则为：年-月-日
+
 function timestampFormatterYMD(timestamp: number): string {
   let d = timestampFormatter(timestamp)
   return `${d.year}-${add0(d.month)}-${add0(d.day)}`
@@ -150,17 +163,8 @@ function timestampFormatterRichExcludeHM(timestamp: number): string {
   let d = timestampFormatter(timestamp)
   let dn = timestampFormatter(Date.now())
 
-  if (d.year < dn.year || d.month < dn.month || d.day < d.day) {
-    let d = timestampFormatter(timestamp)
-    let dn = timestampFormatter(Date.now())
-
-    let ret = `${add0(d.month)}-${add0(d.day)}`
-
-    if (d.year < dn.year) {
-      ret = `${d.year}-` + ret
-    }
-
-    return ret
+  if (d.year < dn.year || d.month < dn.month || d.day < dn.day) {
+    return timestampFormatterStandardExcludeHMSOrAndYear(timestamp)
   }
 
   return timestampFormatterAgo(timestamp)
@@ -181,6 +185,10 @@ function ToCourse(id: number) {
 
 function ToOrg(id: number) {
   window.open(`/org/${id}`, "_blank")
+}
+
+function ToVideo(id: number) {
+  window.open(`/video/${id}`, "_blank")
 }
 
 function ToNewPage(url: string) {
@@ -204,6 +212,39 @@ function getNickname(): string {
   return nickname ? nickname : ""
 }
 
+function categoryConvert(category: string): string {
+  let res = ""
+  switch (category) {
+    case "backend": {
+      res = "后端开发"
+      break
+    }
+    case "frontend": {
+      res = "前端开发"
+      break
+    }
+    case "mobile": {
+      res = "移动开发"
+      break
+    }
+  }
+  return res
+}
+
+function scrollToTopSmoothly() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
+
+function scrollToBottomSmoothly() {
+  window.scrollTo({
+    top: document.documentElement.scrollHeight - window.innerHeight,
+    behavior: 'smooth',
+  })
+}
+
 export {
   isMobile,
   isLogin,
@@ -215,6 +256,7 @@ export {
   timestampFormatter,
   timestampFormatterStandard,
   timestampFormatterStandardExcludeSecondOrAndYear,
+  timestampFormatterStandardExcludeHMSOrAndYear,
   timestampFormatterYMD,
   timestampFormatterAgo,
   timestampFormatterRich,
@@ -223,8 +265,12 @@ export {
   setTokenToLocal,
   ToCourse,
   ToOrg,
+  ToVideo,
   ToNewPage,
   clearLoginStorage,
   getRole,
   getNickname,
+  categoryConvert,
+  scrollToTopSmoothly,
+  scrollToBottomSmoothly,
 }

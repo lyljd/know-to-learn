@@ -6,6 +6,41 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "924578",
+      "name": "clock",
+      "font_class": "clock",
+      "unicode": "e972",
+      "unicode_decimal": 59762
+    },
+    {
+      "icon_id": "36719040",
+      "name": "info-copy",
+      "font_class": "info",
+      "unicode": "e7c9",
+      "unicode_decimal": 59337
+    },
+    {
+      "icon_id": "1190804",
+      "name": "info",
+      "font_class": "info-blue",
+      "unicode": "e643",
+      "unicode_decimal": 58947
+    },
+    {
+      "icon_id": "6652504",
+      "name": "error",
+      "font_class": "error",
+      "unicode": "e6c6",
+      "unicode_decimal": 59078
+    },
+    {
+      "icon_id": "1096518",
+      "name": "video_fill",
+      "font_class": "play",
+      "unicode": "e7c7",
+      "unicode_decimal": 59335
+    },
+    {
       "icon_id": "11870505",
       "name": "warning",
       "font_class": "warning",
@@ -18,6 +53,13 @@
       "font_class": "success",
       "unicode": "e601",
       "unicode_decimal": 58881
+    },
+    {
+      "icon_id": "36718603",
+      "name": "color-success-copy",
+      "font_class": "success-blue",
+      "unicode": "e7c8",
+      "unicode_decimal": 59336
     },
     {
       "icon_id": "11488017",

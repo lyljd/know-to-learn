@@ -1,13 +1,16 @@
 <template>
   <div class="cc-container">
     <div @click="common.ToCourse(data.courseId)" class="cover">
-      <Image :url="data.coverUrl" :h="151.88" customClass="cc-image"></Image>
+      <Image :url="data.coverUrl" :w="270 * scale" :h="151.88 * scale" customClass="cc-image"></Image>
     </div>
     <div @click="common.ToCourse(data.courseId)" class="course-name">
       <span class="name-content">{{ data.courseName }}</span>
     </div>
-    <div @click="common.ToOrg(data.orgId)" class="info">
-      <span class="info-content">{{ `${data.orgName} · ${common.timestampFormatterRichExcludeHM(data.publishTime)}` }}</span>
+    <div @click="orgVisible ? common.ToOrg(data.orgId as number) : null" class="info">
+      <span :class="orgVisible ? 'info-content' : 'info-content-no'">
+        <span v-if="orgVisible">{{ data.orgName }} · </span>
+        <span>{{ common.timestampFormatterRichExcludeHM(data.publishTime) }}</span>
+      </span>
     </div>
   </div>
 </template>
@@ -15,29 +18,24 @@
 <script setup lang="ts">
 import * as common from '@/common'
 
-defineProps<{
+withDefaults(defineProps<{
   data: {
     coverUrl: string,
     courseId: number,
     courseName: string,
-    orgId: number,
-    orgName: string,
+    orgId?: number,
+    orgName?: string,
     publishTime: number,
   },
-}>()
+  orgVisible: boolean,
+  scale: number
+}>(), {
+  orgVisible: true,
+  scale: 1,
+})
 </script>
 
 <style scoped>
-.cc-container {
-  width: 270px;
-  height: 193.88px;
-}
-
-.cc-container .cover {
-  width: 100%;
-  height: 151.88px;
-}
-
 .cc-container .course-name {
   height: 18px;
   font-size: 16px;
@@ -73,6 +71,10 @@ defineProps<{
 
 .cc-container .info .info-content:hover {
   color: #b1b3b8;
+}
+
+.cc-container .info .info-content-no {
+  cursor: default;
 }
 </style>
 
