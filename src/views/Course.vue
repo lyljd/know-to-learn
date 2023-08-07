@@ -166,7 +166,8 @@ function toPath(path: string) {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  background-image: url(../../public/cv.jpg);
+  background-image: url(https://know-to-learn-1314261683.cos.ap-chengdu.myqcloud.com/public/header.jpg);
+  /* background-image: url(../../public/cv.jpg); */
   filter: blur(5px);
   width: 100%;
   position: absolute;

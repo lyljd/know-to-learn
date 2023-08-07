@@ -106,7 +106,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to: any, from: any, next: Function) => {
+router.beforeEach((to: any, _: any, next: Function) => {
   const store = useStore()
   if (to.meta.needLogin && !store.isLogin) {
     next(`/401?from=${to.href}`)

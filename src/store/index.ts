@@ -26,6 +26,6 @@ export const useStore = defineStore("know-to-learn", {
     avatarUrl: localStorage.getItem("avatarUrl"),
 
     openLoginWindow: () => { },
-    openFSWindow: (para: Para) => { },
+    openFSWindow: (_: Para) => { },
   })
 })

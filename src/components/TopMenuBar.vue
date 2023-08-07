@@ -2,17 +2,17 @@
   <div class="tmb-container">
     <el-menu class="menu" mode="horizontal" :default-active=$route.path :ellipsis="false" router="true">
       <div class="logo">
-        <img class="icon" :src="special && isTop ? '../../public/ktl2.png' : '../../public/ktl.png'">
+        <img class="icon" :src="special && isTop ? '/ktl2.png' : '/ktl.png'">
         <span class="site-name">知学随学</span>
       </div>
 
       <el-menu-item index="/">首页</el-menu-item>
-      <el-sub-menu>
+      <!-- <el-sub-menu>
         <template #title>分类</template>
         <el-menu-item index="/category/backend">后端开发</el-menu-item>
         <el-menu-item index="/category/frontend">前端开发</el-menu-item>
         <el-menu-item index="/category/mobile">移动开发</el-menu-item>
-      </el-sub-menu>
+      </el-sub-menu> -->
 
       <div class="flex-grow" />
 
@@ -31,7 +31,7 @@
       <el-popover @show="onAvatarPopShow" :width="250" ref="avatarPop" :show-arrow=false>
         <template #reference>
           <el-avatar class="avatar" v-if="store.isLogin" :src="store.avatarUrl" @error="true">
-            <img src="../../public/default-avatar.png" />
+            <img src="/default-avatar.png" />
           </el-avatar>
         </template>
 

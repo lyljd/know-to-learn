@@ -15,7 +15,7 @@ export default ({ mode }) => defineConfig({
     port: 8080,
     proxy: {
       '/api': {
-        target: loadEnv(mode, "./").VITE_API_SERVER_ADDRESS,
+        target: 'http://192.168.40.116:8090',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
       }
