@@ -16,7 +16,7 @@
 
       <div class="flex-grow" />
 
-      <div class="search-bar">
+      <div :style="{ display: store.curPath === '/search' ? 'none' : 'block' }" class="search-bar">
         <el-input class="search" @keyup.enter.native="toSearch" v-model="searchKey" placeholder="搜索" clearable>
           <template #prefix><el-icon @click="toSearch" class="search-icon">
               <search />
@@ -189,7 +189,7 @@ function toSearch() {
     common.showError("关键字不能为空")
     return
   }
-  common.showInfo(`搜索关键字：${searchKey.value}`)
+  common.ToNewPage(`/search?key=${searchKey.value}`)
 }
 
 function openLoginWindow() {

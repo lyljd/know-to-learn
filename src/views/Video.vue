@@ -18,7 +18,7 @@
           <div @click="common.ToCourse(info.courseId)" class="course-name">{{ info.courseName }}</div>
           <div class="ctl">
             <span>{{ `共${videoNum}个视频` }}</span>
-            <span style="display: flex;align-items: center;">自动连播<el-switch v-model="autoPlay" /></span>
+            <span style="display: flex;align-items: center;">播完跳转下一视频<el-switch v-model="autoPlay" /></span>
           </div>
         </div>
 
@@ -85,9 +85,20 @@ let videoNum = ref(0)
 
 let autoPlay = ref(true)
 let activeChapterId = ref(-1)
+let videoIdList: number[] = []
+let vilIdx = -1
 
 onMounted(() => {
   getVideoInfo()
+
+  const videoEle = document.querySelector(".video-container .left .video") as HTMLVideoElement
+  videoEle.addEventListener("ended", () => {
+    if (autoPlay.value) {
+      if (vilIdx < videoIdList.length - 1) {
+        location.href = `/video/${videoIdList[vilIdx + 1]}`
+      }
+    }
+  })
 })
 
 function toVideo(id: number) {
@@ -100,7 +111,7 @@ function toVideo(id: number) {
 function getVideoInfo() {
   API.getVideoInfo(videoId)
     .then((res) => {
-      if(res.data === null) {
+      if (res.data === null) {
         location.href = `/404`
         return
       }
@@ -119,6 +130,12 @@ function getVideoInfo() {
       info.value.chapters.forEach(c => {
         if (c.videos) {
           videoNum.value += c.videos.length
+          c.videos.forEach(v => {
+            videoIdList.push(v.id)
+            if (v.id === videoId) {
+              vilIdx = videoIdList.length - 1
+            }
+          });
         }
       })
 

@@ -125,7 +125,7 @@ function upload() {
           common.showError(res.message)
           return
         }
-        afterSuccDo(null, videoName.value, "", null)
+        afterSuccDo(null, videoName.value, "", 1)
         closeWindow()
         common.showSuccess("修改成功")
       })

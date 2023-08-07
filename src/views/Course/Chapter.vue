@@ -314,11 +314,12 @@ function delVideo(event: any, idx: number, iidx: number) {
 function modifyVideo(event: any, idx: number, iidx: number) {
   event.stopPropagation()
 
-  openUVW("修改视频", "/api/org/course/chapter/media/update", courseId, data.value.data[idx].child[iidx].id, (_: any, name: string, videoUrl: string, __: any) => {
+  openUVW("修改视频", "/api/org/course/chapter/media/update", courseId, data.value.data[idx].child[iidx].id, (_: any, name: string, videoUrl: string, status: any) => {
     data.value.data[idx].child[iidx].name = name
     if (videoUrl !== "") {
       data.value.data[idx].child[iidx].videoUrl = videoUrl
     }
+    data.value.data[idx].child[iidx].status = status
   }, data.value.data[idx].child[iidx].name, data.value.data[idx].child[iidx].videoUrl)
 }
 
