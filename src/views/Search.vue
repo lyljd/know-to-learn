@@ -110,8 +110,6 @@ function getResult() {
     })
 }
 
-getResult()
-
 onMounted(() => {
   let index = location.href.lastIndexOf("key=")
   let key = ""
@@ -125,6 +123,8 @@ onMounted(() => {
     return
   }
   searchKey.value = key
+
+  getResult()
 })
 </script>
 
