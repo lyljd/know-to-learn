@@ -76,9 +76,9 @@ type Course = {
 }
 
 const homePages = ref<HomePage[]>([
-  { firstSlogan: "知学随学", secondSlogan: "智慧之舟展翅", imgUrl: "https://know-to-learn-1314261683.cos.ap-chengdu.myqcloud.com/public/bg1.jpg" },
-  { firstSlogan: "智行并进", secondSlogan: "探索学海壮阔", imgUrl: "https://know-to-learn-1314261683.cos.ap-chengdu.myqcloud.com/public/bg2.jpg" },
-  { firstSlogan: "知识荟萃", secondSlogan: "智慧光芒绽放", imgUrl: "https://know-to-learn-1314261683.cos.ap-chengdu.myqcloud.com/public/bg3.jpg" },
+  { firstSlogan: "知学随学", secondSlogan: "智慧之舟展翅", imgUrl: "https://know2learn-1314261683.cos.ap-chengdu.myqcloud.com/bg1.jpg" },
+  { firstSlogan: "智行并进", secondSlogan: "探索学海壮阔", imgUrl: "https://know2learn-1314261683.cos.ap-chengdu.myqcloud.com/bg2.jpg" },
+  { firstSlogan: "知识荟萃", secondSlogan: "智慧光芒绽放", imgUrl: "https://know2learn-1314261683.cos.ap-chengdu.myqcloud.com/bg3.jpg" },
   // { firstSlogan: "知学随学", secondSlogan: "智慧之舟展翅", imgUrl: "/bg1.jpg" },
   // { firstSlogan: "智行并进", secondSlogan: "探索学海壮阔", imgUrl: "/bg2.jpg" },
   // { firstSlogan: "知识荟萃", secondSlogan: "智慧光芒绽放", imgUrl: "/bg3.jpg" },

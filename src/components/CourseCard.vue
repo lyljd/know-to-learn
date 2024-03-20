@@ -36,6 +36,11 @@ withDefaults(defineProps<{
 </script>
 
 <style scoped>
+.cc-container .cover {
+  border: 1px solid #CDD0D6;
+  border-radius: 5px;
+}
+
 .cc-container .course-name {
   height: 18px;
   font-size: 16px;
